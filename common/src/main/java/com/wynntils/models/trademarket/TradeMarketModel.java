@@ -8,8 +8,6 @@ import com.wynntils.core.WynntilsMod;
 import com.wynntils.core.components.Handlers;
 import com.wynntils.core.components.Model;
 import com.wynntils.core.components.Models;
-import com.wynntils.core.persisted.Persisted;
-import com.wynntils.core.persisted.storage.Storage;
 import com.wynntils.core.text.StyledText;
 import com.wynntils.handlers.chat.event.ChatMessageEvent;
 import com.wynntils.mc.event.ChatSentEvent;
@@ -47,14 +45,11 @@ import com.wynntils.utils.wynn.WynnUtils;
 import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
-import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -115,10 +110,9 @@ public final class TradeMarketModel extends Model {
 
     private static final int SELLABLE_ITEM_SLOT = 22;
 
-    @Persisted
-    private final Storage<Map<Integer, String>> presetFilters = new Storage<>(new TreeMap<>());
-
     private String lastSearchFilter = "";
+
+    private String currentNameFilter = "";
 
     // Trade Market State
     private static final ContainerBounds FILTER_SLOTS = new ContainerBounds(0, 0, 4, 2);
@@ -225,6 +219,10 @@ public final class TradeMarketModel extends Model {
                     event.cancelChat();
                 }
                 if (inputEvent.getResponse() != null) {
+                    if (tradeMarketState == TradeMarketState.SEARCH_CHAT_INPUT) {
+                        System.out.println("Setting current name filter to: " + inputEvent.getResponse() + " (event)");
+                        currentNameFilter = inputEvent.getResponse();
+                    }
                     McUtils.sendChat(inputEvent.getResponse());
                 }
             }
@@ -238,6 +236,10 @@ public final class TradeMarketModel extends Model {
 
         if (!event.getMessage().isEmpty()) {
             nameFiltersActive = true;
+            if (tradeMarketState == TradeMarketState.SEARCH_CHAT_INPUT) {
+                System.out.println("Setting current name filter to: " + event.getMessage() + " (chat)");
+                currentNameFilter = event.getMessage();
+            }
         }
     }
 
@@ -246,12 +248,6 @@ public final class TradeMarketModel extends Model {
         updateTradeMarketState(TradeMarketState.NOT_ACTIVE);
         nameFiltersActive = false;
         filtersActive = false;
-    }
-
-    // FIXME: The screen title can no longer be used to determine the difference between filtered and non-filtered
-    // results, fix or remove when fixing the custom trade market feature
-    public boolean isFilterScreen(Component component) {
-        return false;
     }
 
     public String getLastSearchFilter() {
@@ -440,6 +436,7 @@ public final class TradeMarketModel extends Model {
 
         TradeMarketState newState;
         if (currentContainer instanceof TradeMarketContainer) {
+            System.out.println("Name filters active: " + nameFiltersActive + ", filters active: " + filtersActive);
             newState = nameFiltersActive || filtersActive
                     ? TradeMarketState.FILTERED_RESULTS
                     : TradeMarketState.DEFAULT_RESULTS;
@@ -480,6 +477,7 @@ public final class TradeMarketModel extends Model {
             TradeMarketState oldState = tradeMarketState;
             tradeMarketState = newState;
 
+            WynntilsMod.info("Trade Market state changed from " + oldState + " to " + newState);
             WynntilsMod.postEvent(new TradeMarketStateEvent(newState, oldState));
         }
     }
