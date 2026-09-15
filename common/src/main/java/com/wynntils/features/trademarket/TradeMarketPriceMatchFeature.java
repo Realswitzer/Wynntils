@@ -97,7 +97,7 @@ public class TradeMarketPriceMatchFeature extends Feature {
                     untaxedBid,
                     Component.translatable("feature.wynntils.tradeMarketPriceMatch.highestBuyOffer"),
                     buttonTooltip);
-            containerScreen.addRenderableWidget(priceButton);
+            containerScreen.addRenderableWidget(priceButton);   
         }
 
         if (priceCheckInfo.ask() != -1) {
@@ -131,6 +131,23 @@ public class TradeMarketPriceMatchFeature extends Feature {
                     Component.translatable("feature.wynntils.tradeMarketPriceMatch.lowestSellOffer"),
                     buttonTooltip);
             containerScreen.addRenderableWidget(priceButton);
+
+            PriceButton priceButton2 = new PriceButton(
+                    rightPos,
+                    containerScreen.topPos + 72,
+                    priceCheckInfo.recommendedPrice(), // i cant remember if this is pre-tax
+                    // if by some terrible miracle this makes it to prod, it'll be translatable.
+                    Component.literal("Match recommended price"),
+                    buttonTooltip);
+            containerScreen.addRenderableWidget(priceButton2);
+
+            PriceButton priceButton3 = new PriceButton(
+                    rightPos,
+                    containerScreen.topPos + 93,
+                    (int) Math.round(untaxedBid * 0.95),
+                    Component.literal("Undercut by 5%"), // again, maybe this will come with extra config
+                    buttonTooltip);
+            containerScreen.addRenderableWidget(priceButton3);
         }
     }
 
