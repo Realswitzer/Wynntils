@@ -1,3 +1,6 @@
+# rejects branch
+untested changes (probably a lot of pseudocode) that are unlikely to make it back upstream
+
 Wynntils
 ========
 [![Discord](https://discordapp.com/api/guilds/394189072635133952/widget.png)](https://discord.gg/ve49m9J)

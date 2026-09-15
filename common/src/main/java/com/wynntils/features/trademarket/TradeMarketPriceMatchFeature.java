@@ -102,8 +102,8 @@ public class TradeMarketPriceMatchFeature extends Feature {
 
         if (priceCheckInfo.ask() != -1) {
             int lowestAsk = priceCheckInfo.ask();
-            int taxedBid = (lowestAsk <= undercutBy.get()) ? 1 : lowestAsk - undercutBy.get();
-            int untaxedBid = Models.Emerald.getWithoutTax(taxedBid);
+            int taxedBid = (lowestAsk <= undercutBy.get()) ? 1 : lowestAsk;
+            int untaxedBid = Models.Emerald.getWithoutTax(taxedBid) - undercutBy.get();
 
             MutableComponent buttonTooltip = (undercutBy.get() == 0)
                     ? Component.translatable("feature.wynntils.tradeMarketPriceMatch.lowestSellOfferMatchesTooltip")
