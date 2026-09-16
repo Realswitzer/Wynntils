@@ -1,7 +1,9 @@
 # rejects branch
 untested changes (probably a lot of pseudocode) that are unlikely to make it back upstream
+
 most of it is probably broken since im on a school chromebook with stock vscode, itll be fixed eventually:tm:
-if the commit is signed with key, that one is tested and functional.
+
+if the commit is signed with key, that one is tested and (mostly?) functional.
 
 Wynntils
 ========

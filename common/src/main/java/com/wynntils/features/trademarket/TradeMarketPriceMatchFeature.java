@@ -97,13 +97,14 @@ public class TradeMarketPriceMatchFeature extends Feature {
                     untaxedBid,
                     Component.translatable("feature.wynntils.tradeMarketPriceMatch.highestBuyOffer"),
                     buttonTooltip);
-            containerScreen.addRenderableWidget(priceButton);   
+            containerScreen.addRenderableWidget(priceButton);
         }
 
         if (priceCheckInfo.ask() != -1) {
             int lowestAsk = priceCheckInfo.ask();
             int taxedBid = (lowestAsk <= undercutBy.get()) ? 1 : lowestAsk;
             int untaxedBid = Models.Emerald.getWithoutTax(taxedBid) - undercutBy.get();
+            taxedBid = Models.Emerald.getWithTax(untaxedBid); // lazy way to reset amount in tooltip
 
             MutableComponent buttonTooltip = (undercutBy.get() == 0)
                     ? Component.translatable("feature.wynntils.tradeMarketPriceMatch.lowestSellOfferMatchesTooltip")
@@ -132,21 +133,49 @@ public class TradeMarketPriceMatchFeature extends Feature {
                     buttonTooltip);
             containerScreen.addRenderableWidget(priceButton);
 
+            MutableComponent buttonTooltip2 = Component.literal("Sets the price back to the recommended price");
+            buttonTooltip2
+                    .append(Component.literal("\n\n"))
+                    .append(Component.translatable("feature.wynntils.tradeMarketPriceMatch.youReceive")
+                            .withStyle(ChatFormatting.GREEN))
+                    .append(getPriceComponent(priceCheckInfo.recommendedPrice()))
+                    .append(Models.Account.isSilverbullSubscriber() ? AccountModel.SILVERBULL_STAR : Component.empty())
+                    .append(Component.literal("\n"))
+                    .append(Component.translatable("feature.wynntils.tradeMarketPriceMatch.totalPrice")
+                            .withStyle(ChatFormatting.GOLD))
+                    .append(getPriceComponent(Models.Emerald.getWithTax(priceCheckInfo.recommendedPrice())));
+
             PriceButton priceButton2 = new PriceButton(
                     rightPos,
                     containerScreen.topPos + 72,
                     priceCheckInfo.recommendedPrice(), // i cant remember if this is pre-tax
                     // if by some terrible miracle this makes it to prod, it'll be translatable.
                     Component.literal("Match recommended price"),
-                    buttonTooltip);
+                    buttonTooltip2);
             containerScreen.addRenderableWidget(priceButton2);
+
+            MutableComponent buttonTooltip3 = Component.literal("Undercuts the lowest sell offer by 5%");
+            buttonTooltip3
+                    .append(Component.literal("\n\n"))
+                    .append(Component.translatable("feature.wynntils.tradeMarketPriceMatch.recommendedPrice")
+                            .withStyle(ChatFormatting.LIGHT_PURPLE))
+                    .append(getPriceComponent(priceCheckInfo.recommendedPrice()))
+                    .append(Component.literal("\n"))
+                    .append(Component.translatable("feature.wynntils.tradeMarketPriceMatch.youReceive")
+                            .withStyle(ChatFormatting.GREEN))
+                    .append(getPriceComponent((int) Math.round(untaxedBid * 0.95)))
+                    .append(Models.Account.isSilverbullSubscriber() ? AccountModel.SILVERBULL_STAR : Component.empty())
+                    .append(Component.literal("\n"))
+                    .append(Component.translatable("feature.wynntils.tradeMarketPriceMatch.totalPrice")
+                            .withStyle(ChatFormatting.GOLD))
+                    .append(getPriceComponent(Models.Emerald.getWithTax((int) Math.round(untaxedBid * 0.95))));
 
             PriceButton priceButton3 = new PriceButton(
                     rightPos,
                     containerScreen.topPos + 93,
                     (int) Math.round(untaxedBid * 0.95),
                     Component.literal("Undercut by 5%"), // again, maybe this will come with extra config
-                    buttonTooltip);
+                    buttonTooltip3);
             containerScreen.addRenderableWidget(priceButton3);
         }
     }
