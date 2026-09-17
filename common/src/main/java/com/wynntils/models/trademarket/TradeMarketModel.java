@@ -28,6 +28,7 @@ import com.wynntils.models.containers.containers.trademarket.TradeMarketTradesCo
 import com.wynntils.models.containers.type.ContainerBounds;
 import com.wynntils.models.items.items.game.GearItem;
 import com.wynntils.models.items.items.game.MaterialItem;
+import com.wynntils.models.items.items.game.MountItem;
 import com.wynntils.models.items.properties.CraftedItemProperty;
 import com.wynntils.models.trademarket.event.TradeMarketChatInputEvent;
 import com.wynntils.models.trademarket.event.TradeMarketSellDialogueUpdatedEvent;
@@ -104,7 +105,8 @@ public final class TradeMarketModel extends Model {
             "§[67] - (?:§f(?<amount>[\\d,]+) §7x )?§(?:(?:(?:c✖|a✔) §f)|f§m|f)(?<price>[\\d,]+)§7(?:§m)?²(?:§b ✮ (?<silverbullPrice>[\\d,]+)§3²)?(?: .+)?");
 
     // Test in TradeMarketModel_SELL_ITEM_NAME_PATTERN
-    private static final Pattern SELL_ITEM_NAME_PATTERN = Pattern.compile("(?:\uDAFC\uDC00|)§.(.+)(?:\uDAFC\uDC00|)");
+    private static final Pattern SELL_ITEM_NAME_PATTERN =
+            Pattern.compile("(?:\uDAFC\uDC00)?(?:§.)?(.+)(?:\uDAFC\uDC00)?");
     private static final String EMPTY_ITEM_SLOT = "Empty Item Slot";
 
     public static final int SORT_ORDER_SLOT = 52;
@@ -126,7 +128,7 @@ public final class TradeMarketModel extends Model {
 
     private String soldItemName = null;
     private Optional<Integer> soldItemTier = Optional.empty();
-    private Optional<Boolean> disableSellButtons = Optional.empty();
+    private boolean shouldDisableSellButtons = false;
 
     public TradeMarketModel() {
         super(List.of());
@@ -373,8 +375,8 @@ public final class TradeMarketModel extends Model {
         return soldItemTier;
     }
 
-    public Optional<Boolean> getDisableSellButtons() {
-        return disableSellButtons;
+    public boolean getShouldDisableSellButtons() {
+        return shouldDisableSellButtons;
     }
 
     private void handleSellDialogueUpdate() {
@@ -384,7 +386,7 @@ public final class TradeMarketModel extends Model {
 
         soldItemName = null;
         soldItemTier = Optional.empty();
-        disableSellButtons = Optional.empty();
+        shouldDisableSellButtons = false;
 
         ItemStack itemStack = cs.getMenu().getSlot(SELLABLE_ITEM_SLOT).getItem();
         if (itemStack != ItemStack.EMPTY) {
@@ -400,12 +402,16 @@ public final class TradeMarketModel extends Model {
                 }
                 Optional<GearItem> gearItemOpt = Models.Item.asWynnItem(itemStack, GearItem.class);
                 if (gearItemOpt.isPresent() && !gearItemOpt.get().isUnidentified()) {
-                    disableSellButtons = Optional.of(true);
+                    shouldDisableSellButtons = true;
                 }
                 Optional<CraftedItemProperty> craftedItemPropertyOpt =
                         Models.Item.asWynnItemProperty(itemStack, CraftedItemProperty.class);
                 if (craftedItemPropertyOpt.isPresent()) {
-                    disableSellButtons = Optional.of(true);
+                    shouldDisableSellButtons = true;
+                }
+                Optional<MountItem> mountItemOpt = Models.Item.asWynnItem(itemStack, MountItem.class);
+                if (mountItemOpt.isPresent()) {
+                    shouldDisableSellButtons = true;
                 }
             }
         }
