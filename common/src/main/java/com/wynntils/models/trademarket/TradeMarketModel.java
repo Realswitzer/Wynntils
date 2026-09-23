@@ -50,6 +50,7 @@ import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.minecraft.client.gui.screens.inventory.ContainerScreen;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.ItemStack;
 import net.neoforged.bus.api.EventPriority;
 import net.neoforged.bus.api.SubscribeEvent;
@@ -256,15 +257,6 @@ public final class TradeMarketModel extends Model {
 
     public void setLastSearchFilter(String lastSearchFilter) {
         this.lastSearchFilter = lastSearchFilter;
-    }
-
-    public Optional<String> getPresetFilter(int presetId) {
-        return Optional.ofNullable(presetFilters.get().get(presetId));
-    }
-
-    public void setPresetFilter(int presetId, String filter) {
-        presetFilters.get().put(presetId, filter);
-        presetFilters.touched();
     }
 
     public TradeMarketSortOrder getSortOrder(ItemStack itemStack) {
