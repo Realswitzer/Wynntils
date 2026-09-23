@@ -50,7 +50,7 @@ public class TradeMarketSearchResultScreen extends WynntilsContainerScreen<Trade
     private static final Identifier INVENTORY_BACKGROUND =
             Identifier.withDefaultNamespace("textures/gui/container/generic_54.png");
     private static final int SCROLL_AREA_HEIGHT = 100;
-    private static final int ITEMS_PER_PAGE = 54;
+    private static final int ITEMS_PER_PAGE = 45;
 
     // Info
     private final TradeMarketSearchResultHolder holder;
